@@ -58,8 +58,17 @@ shinyServer(function(input, output) {
     }) 
     
     
+    
+    output$table <- DT::renderDataTable(DT::datatable({
+        if (input$platform != "All") {
+            gametbl <- gametbl[data$Platform == input$platform,]
+        }
+        gametbl
+    }))
+    
+    
     output$value <- renderPrint({ input$system })
-   # output$platformdata <- renderPlot({ })
+
 
 
 

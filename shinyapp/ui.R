@@ -48,12 +48,26 @@ dashboardPage(
                             plotOutput("scores.corrs"))
                     )),
             tabItem(tabName = "platforms",
-                    fluidRow(
-                        box(title = "By Platform")))
+                    fluidPage(
+                        titlePanel("Explore for yourself!"),
+                        
+                        # select which syst
+                        fluidRow(
+                            column(4, 
+                                   selectInput("platform", 
+                                               "Platform:",
+                                               c("All", unique(as.character(topGames$Platform))))
+                                   )
+                            ),
+                        # table on its own row
+                        box(DT::dataTableOutput("table"))
+                           
+                        
+                    )
+             )
         )
     )
 )
-      
         
         
         
