@@ -14,21 +14,47 @@ library(shinydashboard)
 shinyServer(function(input, output) {
     
     output$years <- renderPlot({
+        VGdata %>%
+            filter(Region != "Global_Sales") %>% 
+            ggplot(aes(x = reorder(Region, -Units_Sold), y = Units_Sold)) +
+            geom_bar(aes(fill = Region), stat = "identity") +
+            xlab("Global Region") +
+            ylab("Units Sold (in millions)") +
+            ggtitle("Units sold (in millions), 1996-2016") +
+            scale_fill_discrete(name = "Regions", 
+                                labels = c("EU", "Japan", "N. America", "Other")) +
+            theme(axis.text.x = element_blank())
+        
+    })
+    
+    output$mosaic <- renderPlot({
         VGdata %>% 
-            filter(Region == "Global_Sales",
-                   Year %in% c(1996:2016)) %>%
-            group_by(Year) %>% 
-            summarise(Yearly_Units = sum(Units_Sold)) %>%
-            ggplot(aes(x = Year, y = Yearly_Units)) +
-            geom_point() + geom_smooth(se = F) +
-            ylab("Units sold per year (in millions")
+            filter(Region != "Global_Sales") %>%
+            ggplot() +
+            geom_mosaic(aes(
+                x = product(Genre, Region), 
+                fill = Genre, weight = Units_Sold))
+        
+    })
+    
+    output$propregion <- renderPlot({
+        VGdata %>%
+            filter(Region != "Global_Sales") %>%
+            ggplot(aes(x = Genre, y = Units_Sold)) +
+            geom_bar(aes(fill = Region), stat = "identity", position = "fill") +
+            ylab("Proportion of Units Sold") +
+            scale_fill_discrete(name = "Regions", 
+                                labels = c("EU", "Japan", "N. America", "Other")) +
+            coord_flip() +
+            ggtitle("Proportion of Units Sold, by Genre and Region")
+        
     })
     
     output$plot1 <- renderPlot({
         VGdata %>% 
             filter(Region != "Global_Sales") %>% 
             ggplot(aes(fill = Region)) +
-            geom_col(aes(x = Region, y = Units_Sold), position = "dodge") +
+            geom_col(aes(x = reorder(Region, -Units_Sold), y = Units_Sold), position = "dodge") +
             facet_wrap(~ Genre) +
             scale_fill_discrete(name = "Regions", 
                                 labels = c("EU", "Japan", "N. America", "Other")) +
@@ -59,12 +85,15 @@ shinyServer(function(input, output) {
     
     
     
-    output$table <- DT::renderDataTable(DT::datatable({
+    output$table <- DT::renderDataTable(
+        
+        
+        DT::datatable({
         if (input$platform != "All") {
-            gametbl <- gametbl[data$Platform == input$platform,]
-        }
-        gametbl
-    }))
+            gametbl <- gametbl[gametbl$Platform == input$platform,]
+        } 
+            gametbl
+    }, rownames = FALSE))
     
     
     output$value <- renderPrint({ input$system })

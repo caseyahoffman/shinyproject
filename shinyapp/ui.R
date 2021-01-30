@@ -12,15 +12,20 @@ library(shinydashboard)
 
 dashboardPage(
     # App title
-    dashboardHeader(title = "Video Game Data Viz"),
+    dashboardHeader(
+        title = "Video Game Data Visualization",
+        titleWidth = 300),
     # sidebar panel
-    dashboardSidebar(
+    dashboardSidebar(width = 300,
         sidebarUserPanel(name = "Casey Hoffman"), # add img from www subfolder
         sidebarMenu(
             # intro: why this matters, basic graph to kick off
             menuItem("Introduction", tabName = "intro", icon = icon("info-circle")),
             # sales by....
             menuItem("Sales by Region", tabName = "sales", icon = icon("globe-americas")),
+            # user/critic ratings
+            menuItem("User and Critic Ratings", tabName = "ratings",
+                     icon = icon("thumbs-up")),
             # platforms...
             menuItem("Platforms", tabName = "platforms", icon = icon("gamepad"))
             # user vs critic scores
@@ -34,13 +39,17 @@ dashboardPage(
                     fluidRow(
                         box("Intro here")),
                     fluidRow(width = 12,
-                        box(plotOutput("years"))) 
+                        box(plotOutput("years")))
                     ),
+            
             tabItem(tabName = "sales",
                     fluidRow(
                         box(title = "Units Sold by Genre and Region",
                             width = 12,
-                            plotOutput("plot1"))),
+                            plotOutput("mosaic")),
+                        box(plotOutput("propregion")))
+                    ),
+            tabItem(tabName = "ratings",
                     fluidRow(
                         box(title = "Scatterplot of User vs Critic Score, by Genre",
                             plotOutput("score.scatter")),
@@ -60,7 +69,8 @@ dashboardPage(
                                    )
                             ),
                         # table on its own row
-                        box(DT::dataTableOutput("table"))
+                        fluidRow(box(DT::dataTableOutput("table"),
+                            width = 12))
                            
                         
                     )
