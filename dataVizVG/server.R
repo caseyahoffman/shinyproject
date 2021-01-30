@@ -16,7 +16,7 @@ shinyServer(function(input, output){
     
     # show data using DT
     output$table <- DT::renderDataTable({
-        datatable(state_stat, rownames = FALSE) %>% 
+        datatable(VGdata, rownames = FALSE) %>% 
             formatStyle(input$selected, background = "skyblue", fontWeight = "bold")
         # highlight selected column using formatStyle
     })
