@@ -15,21 +15,19 @@ shinyServer(function(input, output) {
     
     output$years <- renderPlot({
         VGdata %>%
-            filter(Region != "Global_Sales") %>% 
+            filter(Region != "Global") %>% 
             ggplot(aes(x = reorder(Region, -Units_Sold), y = Units_Sold)) +
             geom_bar(aes(fill = Region), stat = "identity") +
             xlab("Global Region") +
             ylab("Units Sold (in millions)") +
             ggtitle("Units sold (in millions), 1996-2016") +
-            scale_fill_discrete(name = "Regions", 
-                                labels = c("EU", "Japan", "N. America", "Other")) +
             theme(axis.text.x = element_blank())
         
     })
     
     output$mosaic <- renderPlot({
         VGdata %>% 
-            filter(Region != "Global_Sales") %>%
+            filter(Region != "Global") %>%
             ggplot() +
             geom_mosaic(aes(
                 x = product(Genre, Region), 
@@ -39,12 +37,10 @@ shinyServer(function(input, output) {
     
     output$propregion <- renderPlot({
         VGdata %>%
-            filter(Region != "Global_Sales") %>%
+            filter(Region != "Global") %>%
             ggplot(aes(x = Genre, y = Units_Sold)) +
             geom_bar(aes(fill = Region), stat = "identity", position = "fill") +
             ylab("Proportion of Units Sold") +
-            scale_fill_discrete(name = "Regions", 
-                                labels = c("EU", "Japan", "N. America", "Other")) +
             coord_flip() +
             ggtitle("Proportion of Units Sold, by Genre and Region")
         
@@ -52,19 +48,19 @@ shinyServer(function(input, output) {
     
     output$plot1 <- renderPlot({
         VGdata %>% 
-            filter(Region != "Global_Sales") %>% 
+            filter(Region != "Global") %>% 
             ggplot(aes(fill = Region)) +
             geom_col(aes(x = reorder(Region, -Units_Sold), y = Units_Sold), position = "dodge") +
             facet_wrap(~ Genre) +
             scale_fill_discrete(name = "Regions", 
-                                labels = c("EU", "Japan", "N. America", "Other")) +
+                                labels = c("Europe", "Japan", "N. America", "Other")) +
             ylab("Units sold (in millions)") +
             theme(axis.text.x = element_blank())
     })
     
     output$score.scatter <- renderPlot({
         VGdata %>%
-            filter(Region == "Global_Sales") %>% 
+            filter(Region == "Global") %>% 
             ggplot(aes(x = User_Score, y = Critic_Score)) + 
             geom_point(size = 0.5) + 
             geom_smooth(aes(color = Genre), method = lm, se = FALSE) + 
@@ -75,7 +71,7 @@ shinyServer(function(input, output) {
     
     output$scores.corrs <- renderPlot({
         VGdata %>% 
-            filter(Region == "Global_Sales") %>%
+            filter(Region == "Global") %>%
             pivot_longer(cols = c(User_Score, Critic_Score), names_to = "Rating_Type",
                          values_to = "Score") %>% 
             ggplot(aes(x = Score, y = Units_Sold)) + geom_smooth(aes(color = Rating_Type), method = "lm", se = FALSE) +
@@ -85,14 +81,15 @@ shinyServer(function(input, output) {
     
     
     
-    output$table <- DT::renderDataTable(
-        
-        
-        DT::datatable({
+    output$table <- DT::renderDataTable(DT::datatable({
+        gametbl = VGdata
         if (input$platform != "All") {
             gametbl <- gametbl[gametbl$Platform == input$platform,]
         } 
-            gametbl
+        if (input$rgn != "All") {
+            gametbl <- gametbl[gametbl$Region == input$rgn, ]
+        }
+        gametbl
     }, rownames = FALSE))
     
     
