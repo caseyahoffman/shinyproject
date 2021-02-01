@@ -18,7 +18,7 @@ dashboardPage(
         
     # sidebar panel
     dashboardSidebar(width = 300,
-        sidebarUserPanel(name = "Casey Hoffman"), # add img from www subfolder
+        sidebarUserPanel(name = "Casey Hoffman", image = "me.jpg"), 
         sidebarMenu(
             # intro: why this matters, basic graph to kick off
             menuItem("Introduction", tabName = "intro", icon = icon("info-circle")),
@@ -27,10 +27,18 @@ dashboardPage(
             # user/critic ratings
             menuItem("User and Critic Ratings", tabName = "ratings",
                      icon = icon("thumbs-up")),
+            # rating vs sales glm
+            menuItem("Ratings vs Sales", tabName = "glmtab", icon = icon("chart-line")),
             # platforms...
             menuItem("Platforms", tabName = "platforms", icon = icon("gamepad")),
+            # linkedin
+            menuItem("LinkedIn", icon = icon("linkedin"),
+                     href = "https://www.linkedin.com/in/caseyahoffman/", newtab = T),
+            # link to my github!
             menuItem("Source code", icon = icon("git"), 
-                              href = "https://github.com/caseyahoffman/shinyproject/", newtab = T)
+                     href = "https://github.com/caseyahoffman/shinyproject/", newtab = T),
+            menuItem("Dataset access", icon = icon("external-link"),
+                     href = "https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings", newtab = T)
         )
     ),
     
@@ -84,12 +92,45 @@ dashboardPage(
                     ),
             # Ratings
             tabItem(tabName = "ratings",
+                    h2("Relationship between User and Critic Ratings"),
                     fluidRow(
-                        box(title = "Scatterplot of User vs Critic Score, by Genre",
-                            plotOutput("score.scatter")),
-                        box(title = "Relationship between Scores and Units sold (millions)",
-                            plotOutput("scores.corrs"))
-                    )),
+                        box(title = "Scatterplot of User vs Critic Score, by Genre", status = "success",
+                            solidHeader = T, width = 12, plotOutput("score.scatter"))),
+                    fluidRow(
+                        box(title = "Description:", status = "primary", solidHeader = T, width = 12,
+                            "To determine whether there was a relationship between user and critic ratings, I produced a scatterplot of these scores,
+                            divided by genre. Each scatterplot is fitted with a linear regression line to provide a visual indicator of the overall trends.
+                            It is worthwhile to note that non-linear models may provide a more accurate depiction of the relationship.", br(),
+                            "For all genres, there is a positive, linear relationship between user and critic rating. This indicates that in general,
+                            higher user scores can suggest higher critic scores, and that the two ratings are somewhat consistent.", br(),
+                            "However, the strength of this relationship varies by genre. Strategy games, for example, have a relatively weak association,
+                            whereas puzzle games have a relatively strong association."))
+                      ),
+            # Ratings on Sales
+            tabItem(tabName = "glmtab",
+                    h2("Relationship between User/Critic Ratings and Units Sold"),
+                    fluidRow(
+                        box(title = "Relationship between Scores and Units sold (millions)", status = "success",
+                            solidHeader = T, width = 12, plotOutput("scores.corrs"))
+                       ),
+                    fluidRow(
+                        box(title = "Do ratings matter?", status = "primary", solidHeader = T, width = 12,
+                            "Across areas of multimedia entertainment, there is often some discrepancy between critic and consumer scores. This may be
+                            due to different rating criteria -- a critic might be concerned with if a game is of excellent quality, a user may be concerned
+                            with if a game is enjoyable to play. From a business perspective, it is criticial to know if either type of rating impacts sales.
+                            If it is found that user ratings seems to be of substantial effect, developers may wish to reach out to users and solicit reviews.", br(), 
+                            "For each genre, I produced a linear regression line to display the relationship between 1) user score and units sold, displayed in blue, 
+                            and 2) critic score and units sold, displayed in red.", br(), 
+                            "Across all genres, critic scores have a stronger relationship with units sold than user scores. This suggests that to a potential user,
+                            critics' ratings may be influential in determining if a sale is made.
+                            For the Shooter genre, it appears that user ratings are not associated at all with sales, but critic ratings are. This suggests that especially for this genre,
+                            user ratings are not influential when making a purchasing decision, but that critic ratings may be taken into account.", br(),
+                            "Adventure and Strategy game sales are not affected much by either rating type, suggesting purchases in these genres are not 
+                            contingent on critical acclaim. There is a substantially strong relationship between critic scores and units sold, for Action games, 
+                            suggesting that critics' ratings are strongly taken into consideration strongly.")
+                    )
+                    ),
+            # Platforms 
             tabItem(tabName = "platforms",
                     fluidPage(
                         titlePanel("Explore for yourself!"),
@@ -105,7 +146,8 @@ dashboardPage(
                                    selectInput("rgn", 
                                                "Region:", 
                                               c(unique(as.character(gametbl$Region)))
-                                               ))
+                                               )),
+                            infoBoxOutput("topGame"),
                             ),
                         # table on its own row
                         fluidRow(box(DT::dataTableOutput("table"),

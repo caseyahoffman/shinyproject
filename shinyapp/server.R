@@ -75,6 +75,9 @@ shinyServer(function(input, output) {
             pivot_longer(cols = c(User_Score, Critic_Score), names_to = "Rating_Type",
                          values_to = "Score") %>% 
             ggplot(aes(x = Score, y = Units_Sold)) + geom_smooth(aes(color = Rating_Type), method = "lm", se = FALSE) +
+            xlab("Games' Scores by User & Critic (1-100)") +
+            ylab("Units Sold") +
+            ggtitle("Correlation between User/Critic Score & Units Sold") +
             facet_wrap(~ Genre)
         
     }) 
@@ -82,7 +85,6 @@ shinyServer(function(input, output) {
     
     
     output$table <- DT::renderDataTable(DT::datatable({
-        gametbl = VGdata
         if (input$platform != "All") {
             gametbl <- gametbl[gametbl$Platform == input$platform,]
         } 
@@ -91,6 +93,13 @@ shinyServer(function(input, output) {
         }
         gametbl
     }, rownames = FALSE))
+    
+    
+    output$topGame <- renderInfoBox({
+        infoBox(
+            "Best-Selling Game Overall", paste0(gametbl$Name[1]), icon = icon("game-console-handheld"),
+            color = "red", fill = TRUE)
+    })
     
     
     output$value <- renderPrint({ input$system })

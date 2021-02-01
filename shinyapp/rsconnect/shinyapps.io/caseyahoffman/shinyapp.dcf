@@ -1,0 +1,12 @@
+name: shinyapp
+title:
+username:
+account: caseyahoffman
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3556128
+bundleId: 4164791
+url: https://caseyahoffman.shinyapps.io/shinyapp/
+when: 1612137400.79736
+asMultiple: FALSE
+asStatic: FALSE
